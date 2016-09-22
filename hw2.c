@@ -185,7 +185,7 @@ void reshape(int width,int height)
 }
 
 void drawCube() {
-    glBegin(GL_POLYGON);
+    glBegin(GL_TRIANGLES);
     glVertex3d(-1.0f,-1.0f,-1.0f);
     glVertex3d(-1.0f,-1.0f, 1.0f);
     glVertex3d(-1.0f, 1.0f, 1.0f) ;
@@ -241,8 +241,10 @@ void display() {
   float Specular[]  = {1.0,1.0,1.0,1.0};
   float Position[]  = {0.9,0.9,0.9};//{2*Cos(zh),Ylight,2*Sin(zh),1.0};
   float Shinyness[] = {16};
+  //This needs to be called before glClear for reasons unknown!!!!!!!!!!!
+  glEnable(GL_DEPTH_TEST);
   //  Clear the image
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   //  Reset previous transforms
   glLoadIdentity();
   //  Set view angle
@@ -266,13 +268,13 @@ void display() {
   glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,Emission);
 
   //Draw elf dude!
-  /*glPushMatrix();
+  glPushMatrix();
   glScaled(0.1,0.1,0.1);
   glCallList(obj);
-  glPopMatrix();*/
+  glPopMatrix();
 
   //Draw test cube
-  drawCube();
+  //drawCube();
 
   //Draw axes
   glDisable(GL_LIGHTING);
@@ -311,7 +313,7 @@ int main(int argc,char* argv[])
    glutSpecialFunc(special);
    //  Tell GLUT to call "key" when a key is pressed
    glutKeyboardFunc(key);
-   //obj = LoadOBJ("elf_obj.obj");
+   obj = LoadOBJ("elf_obj.obj");
    //  Pass control to GLUT so it can interact with the user
    glutMainLoop();
    //  Return code
