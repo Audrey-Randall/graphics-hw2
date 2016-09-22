@@ -35,6 +35,8 @@ double w=1;     // W variable
 double dim=2;   // Dimension of orthogonal box
 char* text[] = {"","2D","3D constant Z","3D","4D"};  // Dimension display text
 int obj; //loads my elf dude that I made in Sculptris. "Object display list."
+//More things I copied and don't understand from example 26!
+float RGBA[4] = {1,1,1,1};
 #define LEN 8192  // Maximum length of text string
 
 void Print(const char* format , ...)
@@ -181,22 +183,16 @@ void reshape(int width,int height)
    glLoadIdentity();
 }
 
-void setCamera() {
-  double dt = 0.001;
-  double dx = s*(eyeY-eyeX);
-  double dy = eyeX*(r-eyeZ)-eyeY;
-  double dz = eyeX*eyeY - b*eyeZ;
-  eyeX += dt*dx;
-  eyeY += dt*dy;
-  eyeZ += dt*dz;
-  lookX = s*(eyeY-1);
-  lookY = eyeX*(r-eyeZ)-1;
-  lookZ = eyeX*eyeY-b;
-  glutPostRedisplay();
-}
-
 void display() {
-  printf("display \n");
+  //printf("display \n");
+
+  //Lighting variables, taken from example 26
+  float Emission[]  = {0.0,0.0,0.0,1.0};
+  float Ambient[]   = {0.3,0.3,0.3,1.0};
+  float Diffuse[]   = {1.0,1.0,1.0,1.0};
+  float Specular[]  = {1.0,1.0,1.0,1.0};
+  float Position[]  = {0.9,0.9,0.9};//{2*Cos(zh),Ylight,2*Sin(zh),1.0};
+  float Shinyness[] = {16};
   //  Clear the image
   glClear(GL_COLOR_BUFFER_BIT);
   //  Reset previous transforms
@@ -204,10 +200,30 @@ void display() {
   //  Set view angle
   glRotated(ph,1,0,0);
   glRotated(th,0,1,0);
-  //setCamera();
-  //gluLookAt(eyeX,eyeY,eyeZ,lookX,lookY,lookZ,0,1,0);
-  //gluLookAt(1,0,0,0,0,0,0,1,0);
+
+  glEnable(GL_NORMALIZE); //Normalizes all the normal vectors.
+  glEnable(GL_LIGHTING);
+  //  Enable light 0
+  glEnable(GL_LIGHT0);
+  //  Set ambient, diffuse, specular components and position of light 0
+  glLightfv(GL_LIGHT0,GL_AMBIENT ,Ambient);
+  glLightfv(GL_LIGHT0,GL_DIFFUSE ,Diffuse);
+  glLightfv(GL_LIGHT0,GL_SPECULAR,Specular);
+  glLightfv(GL_LIGHT0,GL_POSITION,Position);
+  //  Set materials
+  glMaterialfv(GL_FRONT_AND_BACK,GL_SHININESS,Shinyness);
+  glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,RGBA);
+  glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,RGBA);
+  glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,Specular);
+  glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,Emission);
+
+  glPushMatrix();
+  glScaled(0.1,0.1,0.1);
+  glCallList(obj);
+  glPopMatrix();
+
   //Draw axes
+  glDisable(GL_LIGHTING);
   glColor3f(1,1,1);
   glBegin(GL_LINES);
   glVertex3d(0,0,0);
@@ -217,12 +233,7 @@ void display() {
   glVertex3d(0,0,0);
   glVertex3d(0,0,1);
   glEnd();
-  //Draw attractor
-  //setPoints();
-  glPushMatrix();
-  //glScaled(scale,scale,scale);
-  glCallList(obj);
-  glPopMatrix();
+
   glutSwapBuffers(); //this is for double buffered window. Single buffered uses glFlush.
   frame++;
 }
