@@ -1,7 +1,8 @@
 /*
-  Audrey Randall's Lorenz attractor
+  Audrey Randall's homework 2
   Citations:
-    example 6 from class
+    example 26 from class
+    http://www.opengl-tutorial.org/beginners-tutorials/tutorial-4-a-colored-cube/
 */
 
 #include <stdio.h>
@@ -183,6 +184,53 @@ void reshape(int width,int height)
    glLoadIdentity();
 }
 
+void drawCube() {
+    glBegin(GL_POLYGON);
+    glVertex3d(-1.0f,-1.0f,-1.0f);
+    glVertex3d(-1.0f,-1.0f, 1.0f);
+    glVertex3d(-1.0f, 1.0f, 1.0f) ;
+    glVertex3d(1.0f, 1.0f,-1.0f);
+    glVertex3d(-1.0f,-1.0f,-1.0f);
+    glVertex3d(-1.0f, 1.0f,-1.0f);
+    glColor3f(1,0,0);
+    glVertex3d(1.0f,-1.0f, 1.0f);
+    glVertex3d(-1.0f,-1.0f,-1.0f);
+    glVertex3d(1.0f,-1.0f,-1.0f);
+    glVertex3d(1.0f, 1.0f,-1.0f);
+    glVertex3d(1.0f,-1.0f,-1.0f);
+    glVertex3d(-1.0f,-1.0f,-1.0f);
+    glColor3f(0,1,0);
+    glVertex3d(-1.0f,-1.0f,-1.0f);
+    glVertex3d(-1.0f, 1.0f, 1.0f);
+    glVertex3d(-1.0f, 1.0f,-1.0f);
+    glVertex3d(1.0f,-1.0f, 1.0f);
+    glVertex3d(-1.0f,-1.0f, 1.0f);
+    glVertex3d(-1.0f,-1.0f,-1.0f);
+    glColor3f(0,0,1);
+    glVertex3d(-1.0f, 1.0f, 1.0f);
+    glVertex3d(-1.0f,-1.0f, 1.0f);
+    glVertex3d(1.0f,-1.0f, 1.0f);
+    glVertex3d(1.0f, 1.0f, 1.0f);
+    glVertex3d(1.0f,-1.0f,-1.0f);
+    glVertex3d(1.0f, 1.0f,-1.0f);
+    glColor3f(1,0,1);
+    glVertex3d(1.0f,-1.0f,-1.0f);
+    glVertex3d(1.0f, 1.0f, 1.0f);
+    glVertex3d(1.0f,-1.0f, 1.0f);
+    glVertex3d(1.0f, 1.0f, 1.0f);
+    glVertex3d(1.0f, 1.0f,-1.0f);
+    glVertex3d(-1.0f, 1.0f,-1.0f);
+    glColor3f(0,1,1);
+    glVertex3d(1.0f, 1.0f, 1.0f);
+    glVertex3d(-1.0f, 1.0f,-1.0f);
+    glVertex3d(-1.0f, 1.0f, 1.0f);
+    glVertex3d(1.0f, 1.0f, 1.0f);
+    glVertex3d(-1.0f, 1.0f, 1.0f);
+    glVertex3d(1.0f,-1.0f, 1.0f);
+    glEnd();
+    glFlush();
+}
+
 void display() {
   //printf("display \n");
 
@@ -217,10 +265,14 @@ void display() {
   glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,Specular);
   glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,Emission);
 
-  glPushMatrix();
+  //Draw elf dude!
+  /*glPushMatrix();
   glScaled(0.1,0.1,0.1);
   glCallList(obj);
-  glPopMatrix();
+  glPopMatrix();*/
+
+  //Draw test cube
+  drawCube();
 
   //Draw axes
   glDisable(GL_LIGHTING);
@@ -234,6 +286,7 @@ void display() {
   glVertex3d(0,0,1);
   glEnd();
 
+  glFlush();
   glutSwapBuffers(); //this is for double buffered window. Single buffered uses glFlush.
   frame++;
 }
@@ -242,12 +295,14 @@ int main(int argc,char* argv[])
 {
   //  Initialize GLUT and process user parameters
    glutInit(&argc,argv);
-   //  Request double buffered, true color window
-   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+   //  Request double buffered, true color window with z-buffering
+   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE| GLUT_DEPTH);
+   glEnable(GL_DEPTH_TEST);
+
    //  Request 500 x 500 pixel window
    glutInitWindowSize(500,500);
    //  Create the window
-   glutCreateWindow("Test");
+   glutCreateWindow("Homework 2: Audrey Randall");
    //  Tell GLUT to call "display" when the scene should be drawn
    glutDisplayFunc(display);
   //  Tell GLUT to call "reshape" when the window is resized
@@ -256,7 +311,7 @@ int main(int argc,char* argv[])
    glutSpecialFunc(special);
    //  Tell GLUT to call "key" when a key is pressed
    glutKeyboardFunc(key);
-   obj = LoadOBJ("elf_obj.obj");
+   //obj = LoadOBJ("elf_obj.obj");
    //  Pass control to GLUT so it can interact with the user
    glutMainLoop();
    //  Return code
