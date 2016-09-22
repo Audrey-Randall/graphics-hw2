@@ -28,6 +28,7 @@ double eyeZ = 1;
 double lookX = 0;
 double lookY = 0;
 double lookZ = 0;
+double cubeRotate = 0;
 int th=0;       // Azimuth of view angle
 int ph=0;       // Elevation of view angle
 int mode=1;     // Dimension (1-4)
@@ -39,6 +40,7 @@ int obj; //loads my elf dude that I made in Sculptris. "Object display list."
 //More things I copied and don't understand from example 26!
 float RGBA[4] = {1,1,1,1};
 #define LEN 8192  // Maximum length of text string
+#define PI 3.1415926
 
 void Print(const char* format , ...)
 {
@@ -269,15 +271,27 @@ void display() {
 
   //Draw elf dude!
   glPushMatrix();
+  glRotated(180,0,1,0);
   glScaled(0.1,0.1,0.1);
   glCallList(obj);
   glPopMatrix();
 
-  //Draw test cube
-  //drawCube();
+  //Allow regular color to work again
+  glDisable(GL_LIGHTING);
+  //Draw some cubes. Why don't the lighting and mats etc. apply here if GL_LIGHTING is still enabled?
+  double rad = 1.6;
+  double i;
+  printf("cubeRotate is %f", cubeRotate);
+  for(i = 0; i < (2*PI); i+=(PI/4)) {
+    glPushMatrix();
+    glTranslated(rad*cos(i),rad*sin(i),0);
+    glScaled(0.1,0.1,0.1);
+    glRotated(cubeRotate, 1, 0, 0);
+    drawCube();
+    glPopMatrix();
+  }
 
   //Draw axes
-  glDisable(GL_LIGHTING);
   glColor3f(1,1,1);
   glBegin(GL_LINES);
   glVertex3d(0,0,0);
@@ -293,6 +307,18 @@ void display() {
   frame++;
 }
 
+/*
+ *  GLUT calls this routine when the window is resized
+ */
+void idle()
+{
+   //  Elapsed time in seconds
+   double t = glutGet(GLUT_ELAPSED_TIME)/1000.0;
+   cubeRotate = fmod(90*t,360.0);
+   //  Tell GLUT it is necessary to redisplay the scene
+   glutPostRedisplay();
+}
+
 int main(int argc,char* argv[])
 {
   //  Initialize GLUT and process user parameters
@@ -304,7 +330,7 @@ int main(int argc,char* argv[])
    //  Request 500 x 500 pixel window
    glutInitWindowSize(500,500);
    //  Create the window
-   glutCreateWindow("Homework 2: Audrey Randall");
+   glutCreateWindow("Elvish Magician");
    //  Tell GLUT to call "display" when the scene should be drawn
    glutDisplayFunc(display);
   //  Tell GLUT to call "reshape" when the window is resized
