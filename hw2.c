@@ -188,49 +188,71 @@ void reshape(int width,int height)
 
 void drawCube() {
     glBegin(GL_TRIANGLES);
+    glColor3f(1,1,0); //yellow
+    glNormal3f(-1,0,0);
     glVertex3d(-1.0f,-1.0f,-1.0f);
     glVertex3d(-1.0f,-1.0f, 1.0f);
-    glVertex3d(-1.0f, 1.0f, 1.0f) ;
-    glVertex3d(1.0f, 1.0f,-1.0f);
-    glVertex3d(-1.0f,-1.0f,-1.0f);
-    glVertex3d(-1.0f, 1.0f,-1.0f);
-    glColor3f(1,0,0);
-    glVertex3d(1.0f,-1.0f, 1.0f);
-    glVertex3d(-1.0f,-1.0f,-1.0f);
-    glVertex3d(1.0f,-1.0f,-1.0f);
-    glVertex3d(1.0f, 1.0f,-1.0f);
-    glVertex3d(1.0f,-1.0f,-1.0f);
-    glVertex3d(-1.0f,-1.0f,-1.0f);
-    glColor3f(0,1,0);
+    glVertex3d(-1.0f, 1.0f, 1.0f);
     glVertex3d(-1.0f,-1.0f,-1.0f);
     glVertex3d(-1.0f, 1.0f, 1.0f);
     glVertex3d(-1.0f, 1.0f,-1.0f);
+
+    glNormal3f(0,0,-1);
+    glColor3f(1,0,0); //red
+    glVertex3d(1.0f, 1.0f,-1.0f);
+    glVertex3d(-1.0f,-1.0f,-1.0f);
+    glVertex3d(-1.0f, 1.0f,-1.0f);
+    glVertex3d(1.0f, 1.0f,-1.0f);
+    glVertex3d(1.0f,-1.0f,-1.0f);
+    glVertex3d(-1.0f,-1.0f,-1.0f);
+
+    glColor3f(0,1,0); //green
+    glVertex3d(1.0f,-1.0f, 1.0f);
+    glVertex3d(-1.0f,-1.0f,-1.0f);
+    glVertex3d(1.0f,-1.0f,-1.0f);
     glVertex3d(1.0f,-1.0f, 1.0f);
     glVertex3d(-1.0f,-1.0f, 1.0f);
     glVertex3d(-1.0f,-1.0f,-1.0f);
-    glColor3f(0,0,1);
+
+    glColor3f(0,0,1); //blue correct
     glVertex3d(-1.0f, 1.0f, 1.0f);
     glVertex3d(-1.0f,-1.0f, 1.0f);
     glVertex3d(1.0f,-1.0f, 1.0f);
     glVertex3d(1.0f, 1.0f, 1.0f);
-    glVertex3d(1.0f,-1.0f,-1.0f);
-    glVertex3d(1.0f, 1.0f,-1.0f);
-    glColor3f(1,0,1);
+    glVertex3d(-1.0f, 1.0f, 1.0f);
+    glVertex3d(1.0f,-1.0f, 1.0f);
+
+    glColor3f(1,0,1); //magenta
     glVertex3d(1.0f,-1.0f,-1.0f);
     glVertex3d(1.0f, 1.0f, 1.0f);
     glVertex3d(1.0f,-1.0f, 1.0f);
     glVertex3d(1.0f, 1.0f, 1.0f);
+    glVertex3d(1.0f,-1.0f,-1.0f);
+    glVertex3d(1.0f, 1.0f,-1.0f);
+
+    glColor3f(0,1,1); //cyan correct
+    glVertex3d(1.0f, 1.0f, 1.0f);
+    glVertex3d(-1.0f, 1.0f,-1.0f);
+    glVertex3d(-1.0f, 1.0f, 1.0f);
+    glVertex3d(1.0f, 1.0f, 1.0f);
     glVertex3d(1.0f, 1.0f,-1.0f);
     glVertex3d(-1.0f, 1.0f,-1.0f);
-    glColor3f(0,1,1);
-    glVertex3d(1.0f, 1.0f, 1.0f);
-    glVertex3d(-1.0f, 1.0f,-1.0f);
-    glVertex3d(-1.0f, 1.0f, 1.0f);
-    glVertex3d(1.0f, 1.0f, 1.0f);
-    glVertex3d(-1.0f, 1.0f, 1.0f);
-    glVertex3d(1.0f,-1.0f, 1.0f);
+
     glEnd();
     glFlush();
+}
+
+void drawAxes(){
+  //Draw axes
+  glColor3f(1,1,1);
+  glBegin(GL_LINES);
+  glVertex3d(0,0,0);
+  glVertex3d(1,0,0);
+  glVertex3d(0,0,0);
+  glVertex3d(0,1,0);
+  glVertex3d(0,0,0);
+  glVertex3d(0,0,1);
+  glEnd();
 }
 
 void display() {
@@ -281,26 +303,16 @@ void display() {
   //Draw some cubes. Why don't the lighting and mats etc. apply here if GL_LIGHTING is still enabled?
   double rad = 1.6;
   double i;
-  printf("cubeRotate is %f", cubeRotate);
+  //printf("cubeRotate is %f \n", cubeRotate);
   for(i = 0; i < (2*PI); i+=(PI/4)) {
     glPushMatrix();
     glTranslated(rad*cos(i),rad*sin(i),0);
     glScaled(0.1,0.1,0.1);
-    glRotated(cubeRotate, 1, 0, 0);
+    glRotated(cubeRotate, cos(i), sin(i), 0);
     drawCube();
     glPopMatrix();
   }
-
-  //Draw axes
-  glColor3f(1,1,1);
-  glBegin(GL_LINES);
-  glVertex3d(0,0,0);
-  glVertex3d(1,0,0);
-  glVertex3d(0,0,0);
-  glVertex3d(0,1,0);
-  glVertex3d(0,0,0);
-  glVertex3d(0,0,1);
-  glEnd();
+  //drawAxes();
 
   glFlush();
   glutSwapBuffers(); //this is for double buffered window. Single buffered uses glFlush.
@@ -314,7 +326,7 @@ void idle()
 {
    //  Elapsed time in seconds
    double t = glutGet(GLUT_ELAPSED_TIME)/1000.0;
-   cubeRotate = fmod(90*t,360.0);
+   cubeRotate = fmod(100*t,360.0);
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
@@ -331,14 +343,12 @@ int main(int argc,char* argv[])
    glutInitWindowSize(500,500);
    //  Create the window
    glutCreateWindow("Elvish Magician");
-   //  Tell GLUT to call "display" when the scene should be drawn
+
    glutDisplayFunc(display);
-  //  Tell GLUT to call "reshape" when the window is resized
    glutReshapeFunc(reshape);
-   //  Tell GLUT to call "special" when an arrow key is pressed
    glutSpecialFunc(special);
-   //  Tell GLUT to call "key" when a key is pressed
    glutKeyboardFunc(key);
+   glutIdleFunc(idle);
    obj = LoadOBJ("elf_obj.obj");
    //  Pass control to GLUT so it can interact with the user
    glutMainLoop();
