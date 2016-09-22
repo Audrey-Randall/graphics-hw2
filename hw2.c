@@ -17,27 +17,17 @@
 #include <GL/glut.h>
 #endif
 
-/*  Lorenz Parameters  */
-double s  = 10;
-double b  = 2.6666;
-double r  = 28;
-int frame = 1;
-double eyeX = 1;
-double eyeY = 1;
-double eyeZ = 1;
-double lookX = 0;
-double lookY = 0;
-double lookZ = 0;
+double w2h;
 double cubeRotate = 0;
 int th=0;       // Azimuth of view angle
 int ph=0;       // Elevation of view angle
-int mode=1;     // Dimension (1-4)
 double z=0;     // Z variable
 double w=1;     // W variable
 double dim=2;   // Dimension of orthogonal box
 char* text[] = {"","2D","3D constant Z","3D","4D"};  // Dimension display text
 int obj; //loads my elf dude that I made in Sculptris. "Object display list."
-//More things I copied and don't understand from example 26!
+int shouldMove = 1;
+//More things I copied from example 26!
 float RGBA[4] = {1,1,1,1};
 #define LEN 8192  // Maximum length of text string
 #define PI 3.1415926
@@ -70,74 +60,20 @@ void key(unsigned char ch,int x,int y)
    //  Increase w by 0.1
    else if (ch == '+')
    {
-      if (mode==2)
-         z += 0.1;
-      else
-         w += 0.1;
+      w += 0.1;
    }
    //  Decrease w by 0.1
    else if (ch == '-')
    {
-      if (mode==2)
-         z -= 0.1;
-      else
-         w -= 0.1;
-   }
-   //Change parameters
-   else if(ch == 'S') {
-     s+=1;
+      w -= 0.1;
    }
    else if(ch == 's') {
-     s = s-1;
+     shouldMove=!shouldMove;
    }
-   else if(ch == 'B') {
-      b += 0.1;
-   }
-   else if(ch == 'b') {
-     b = b-0.1;
-   }
-   else if(ch == 'R') {
-      r += 2;
-   }
-   else if(ch == 'r') {
-     r = r - 2;
-   }
+
+   Project(0,w2h,dim);
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
-}
-
-void setPoints(){
-  int i;
-   /*  Coordinates  */
-   double x = 1;
-   double y = 1;
-   double z = 1;
-   /*  Time step  */
-   double dt = 0.001;
-
-   printf("%5d %8.3f %8.3f %8.3f\n",0,x,y,z);
-   /*
-    *  Integrate 50,000 steps (50 time units with dt = 0.001)
-    *  Explicit Euler integration
-    */
-  glColor3f(1,1,1);
-  glLineWidth(1);
-  glPointSize(20);
-  glBegin(GL_LINES);
-   for (i=0;i<50000;i++)
-   {
-      glColor3f(0,i/50000., 1-i/50000.);
-      glVertex3d(x/30,y/30,z/30);
-      double dx = s*(y-x);
-      double dy = x*(r-z)-y;
-      double dz = x*y - b*z;
-      x += dt*dx;
-      y += dt*dy;
-      z += dt*dz;
-      //printf("%5d %8.3f %8.3f %8.3f\n",i+1,x,y,z);
-      glVertex3d(x/30,y/30,z/30);
-   }
-   glEnd();
 }
 
 /*
@@ -157,9 +93,17 @@ void special(int key,int x,int y)
    //  Down arrow key - decrease elevation by 5 degrees
    else if (key == GLUT_KEY_DOWN)
       ph += 5;
+    //  PageUp key - increase dim
+    else if (key == GLUT_KEY_PAGE_DOWN)
+       dim += 0.1;
+    //  PageDown key - decrease dim
+    else if (key == GLUT_KEY_PAGE_UP && dim>1)
+       dim -= 0.1;
    //  Keep angles to +/-360 degrees
    th %= 360;
    ph %= 360;
+
+   Project(0,w2h,dim);
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
@@ -170,20 +114,11 @@ void special(int key,int x,int y)
 void reshape(int width,int height)
 {
    //  Ratio of the width to the height of the window
-   double w2h = (height>0) ? (double)width/height : 1;
+   w2h = (height>0) ? (double)width/height : 1;
    //  Set the viewport to the entire window
    glViewport(0,0, width,height);
    //  Tell OpenGL we want to manipulate the projection matrix
-   glMatrixMode(GL_PROJECTION);
-   //  Undo previous transformations
-   glLoadIdentity();
-   //  Orthogonal projection box adjusted for the
-   //  aspect ratio of the window
-   glOrtho(-dim*w2h,+dim*w2h, -dim,+dim, -dim,+dim);
-   //  Switch to manipulating the model matrix
-   glMatrixMode(GL_MODELVIEW);
-   //  Undo previous transformations
-   glLoadIdentity();
+   Project(0, w2h, dim);
 }
 
 void drawCube() {
@@ -297,7 +232,6 @@ void display() {
   glScaled(0.1,0.1,0.1);
   glCallList(obj);
   glPopMatrix();
-
   //Allow regular color to work again
   glDisable(GL_LIGHTING);
   //Draw some cubes. Why don't the lighting and mats etc. apply here if GL_LIGHTING is still enabled?
@@ -312,11 +246,29 @@ void display() {
     drawCube();
     glPopMatrix();
   }
-  //drawAxes();
 
+  //drawAxes();
   glFlush();
   glutSwapBuffers(); //this is for double buffered window. Single buffered uses glFlush.
-  frame++;
+}
+
+//Projection function, mostly stolen as usual from Example 26
+void Project(double fov,double asp,double dim)
+{
+   //  Tell OpenGL we want to manipulate the projection matrix
+   glMatrixMode(GL_PROJECTION);
+   //  Undo previous transformations
+   glLoadIdentity();
+   //  Perspective transformation
+   if (fov)
+      gluPerspective(fov,asp,dim/16,16*dim);
+   //  Orthogonal transformation
+   else
+      glOrtho(-asp*dim,asp*dim,-dim,+dim,-dim,+dim);
+   //  Switch to manipulating the model matrix
+   glMatrixMode(GL_MODELVIEW);
+   //  Undo previous transformations
+   glLoadIdentity();
 }
 
 /*
@@ -326,7 +278,7 @@ void idle()
 {
    //  Elapsed time in seconds
    double t = glutGet(GLUT_ELAPSED_TIME)/1000.0;
-   cubeRotate = fmod(100*t,360.0);
+   if(shouldMove) cubeRotate = fmod(100*t,360.0);
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
