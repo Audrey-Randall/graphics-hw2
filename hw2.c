@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <time.h>
-#include "CSCIx229.h"
+#include <math.h>
 //  OpenGL with prototypes for glext
 #define GL_GLEXT_PROTOTYPES
 #ifdef __APPLE__
@@ -35,9 +35,8 @@ int spineAnglesSet = 0;
 double spineAngles[SPINES*4];
 #define LEN 8192  // Maximum length of text string
 #define PI 3.1415926
-//those were here already?
-//#define Sin(theta) (sin(PI*theta/180))
-//#define Cos(theta) (cos(PI*theta/180))
+#define Cos(th) cos(3.1415926/180*(th))
+#define Sin(th) sin(3.1415926/180*(th))
 
 void Print(const char* format , ...)
 {
@@ -383,7 +382,7 @@ int main(int argc,char* argv[])
    //  Request 500 x 500 pixel window
    glutInitWindowSize(500,500);
    //  Create the window
-   glutCreateWindow("Elvish Magician");
+   glutCreateWindow("Oogluong the Elder Sea Urchin (Audrey Randall)");
 
    glutDisplayFunc(display);
    glutReshapeFunc(reshape);
