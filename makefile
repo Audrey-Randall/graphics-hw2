@@ -1,5 +1,5 @@
 # Example 6
-ASSIGN=hw2
+ASSIGN=hw3
 
 # Main target
 all: $(ASSIGN)
@@ -24,13 +24,8 @@ CLEAN=rm -f $(ASSIGN1) *.o *.a
 endif
 
 #Dependencies
-hw2.o: hw2.c CSCIx229.h
-object.o: object.c CSCIx229.h
-fatal.o: fatal.c CSCIx229.h
+hw3.o: hw3.c 
 
-#  Create archive
-CSCIx229.a:object.o fatal.o
-	ar -rcs $@ $^
 
 # Compile rules
 #Preceding dot means that target is not a valid default target: more needs to be done once it's made
@@ -41,7 +36,7 @@ CSCIx229.a:object.o fatal.o
 	g++ -c $(CFLG) $<
 
 #  Link
-hw2: hw2.o CSCIx229.a
+hw3: hw3.o 
 	gcc -O3 -o $@ $^   $(LIBS)
 
 #  Clean
